@@ -12,7 +12,7 @@ import Login from "./pages/login/Login";
 import Edit from "./pages/Course/Edit";
 
 const App = () => {
-  const [accessToken, setAccessToken] = useState(null);
+  
 
   // const handleLogin = () => {
   //   window.location.href = 'http://localhost:4000/auth/google';
@@ -23,7 +23,6 @@ const App = () => {
     const token = queryParams.get('access_token');
 
     if (token) {
-      setAccessToken(token);
       localStorage.setItem('accessToken', token); 
       window.history.replaceState({}, document.title, window.location.pathname);
     }

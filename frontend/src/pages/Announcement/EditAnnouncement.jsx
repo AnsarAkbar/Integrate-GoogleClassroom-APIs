@@ -3,6 +3,7 @@ import './CourseAnnouncement.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Outlet } from 'react-router-dom';
+import useApi from '../../utils/api';
 
 const EditAnnouncement = () => {
     const [announcement, setannouncement] = useState({
@@ -15,14 +16,11 @@ const EditAnnouncement = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState(null);
     const { courseId, announcementId } = useParams();
+    const { apiRequest } = useApi();
 
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-        navigate('/login');
-    }
+    
 
     const navigate = useNavigate();
-    // console.log('announcement', announcement);
 
 
     const handleSubmit = async (e) => {
@@ -30,27 +28,16 @@ const EditAnnouncement = () => {
         setLoading(true);
 
         try {
-            const response = await axios.patch(
-                `https://classroom.googleapis.com/v1/courses/${courseId}/announcements/${announcementId}?updateMask=text`,
-                {
-                    text: announcement?.text,
-                    // materials: [
-                    //     {
-                    //         link: {
-                    //             url: announcement?.link,
-                    //             title: "Study Guide"
-                    //         }
-                    //     }
-                    // ],
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            // console.log('response:', response);
+            await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/announcements/${announcementId}?updateMask=text`, 'PATCH', {
+                text: announcement.text,
+                // materials: [
+                //     {
+                //         link: {
+                //             url: announcement.link,
+                //             title: 'Study Guide',
+                //         },
+                // ],
+            });
             setannouncement({ text: '', link: '' });
             setMessage('Announcement updated successfully');
             navigate(`/announcement-list/${courseId}`);
@@ -65,15 +52,9 @@ const EditAnnouncement = () => {
     useEffect(() => {
         const fetchAnnouncement = async () => {
             try {
-                const response = await axios.get(
-                    `https://classroom.googleapis.com/v1/courses/${courseId}/announcements/${announcementId}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    }
-                );
-                setannouncement({ text: response.data.text})
+                const response = await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/announcements/${announcementId}`)
+
+                setannouncement({ text: response.data.text })
                 // setannouncement({ text: response.data.text, link: `${response.data.materials ? response.data.materials[0].link.url : ''}` });
             } catch (error) {
                 console.error('Error fetching announcement:', error);
@@ -83,7 +64,7 @@ const EditAnnouncement = () => {
 
         fetchAnnouncement();
     }
-        , [courseId, announcementId, accessToken]);
+        , [courseId, announcementId]);
 
 
     return (

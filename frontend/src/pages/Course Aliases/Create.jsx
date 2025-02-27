@@ -3,6 +3,7 @@ import '../Announcement/CourseAnnouncement.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Outlet } from 'react-router-dom';
+import useApi from '../../utils/api';
 
 const Create = () => {
     const [alias, setAlias] = useState({
@@ -13,12 +14,8 @@ const Create = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const { courseId } = useParams();
+    const { apiRequest }=useApi();
 
-    const accessToken = localStorage.getItem('accessToken');
-    
-    if (!accessToken) {
-        navigate('/login');
-    }
 
     const validateAlias = (alias) => {
         const aliasPattern = /^d:[a-z0-9-]+$/;
@@ -36,20 +33,10 @@ const Create = () => {
         }
     
         try {
-            console.log('Creating alias:', alias.alias);
-            const response = await axios.post(
-                `https://classroom.googleapis.com/v1/courses/${courseId}/aliases`,
-                {
-                    alias: alias.alias,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            console.log('Response:', response.data);
+            apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/aliases`, 'POST', {
+                alias: alias.alias,
+            });
+            // console.log('Response:', response.data);
             setAlias({ alias: '' });
             setMessage('Course alias created successfully');
             navigate(`/course-aliases/${courseId}`);

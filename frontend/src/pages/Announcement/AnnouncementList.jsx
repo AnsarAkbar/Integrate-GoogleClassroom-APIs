@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './AnnouncementList.css';
+import useApi from '../../utils/api';
 
 const AnnouncementList = () => {
     const [announcements, setAnnouncements] = useState([]);
@@ -9,23 +10,13 @@ const AnnouncementList = () => {
     const [error, setError] = useState(null);
     const { courseId } = useParams();
     const navigate = useNavigate();
+    const {apiRequest} =useApi();
 
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-        navigate('/login');
-    }
 
     useEffect(() => {
         const fetchCourseDetails = async () => {
             try {
-                const response = await axios.get(
-                    `https://classroom.googleapis.com/v1/courses/${courseId}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    }
-                );
+                const response = await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}`);
                 setCourseName(response.data.name);
             } catch (error) {
                 console.error('Error fetching course details:', error);
@@ -35,14 +26,7 @@ const AnnouncementList = () => {
 
         const fetchAnnouncements = async () => {
             try {
-                const response = await axios.get(
-                    `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    }
-                );
+                const response = await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/announcements`);
                 setAnnouncements(response?.data?.announcements || []);
             } catch (error) {
                 console.error('Error fetching announcements:', error);
@@ -60,14 +44,7 @@ const AnnouncementList = () => {
 
     const handleDelete = async (announcementId) => {
         try {
-            await axios.delete(
-                `https://classroom.googleapis.com/v1/courses/${courseId}/announcements/${announcementId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
+            const response = await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/announcements/${announcementId}`, 'delete');
             setAnnouncements(announcements.filter(announcement => announcement.id !== announcementId));
         } catch (error) {
             console.error('Error deleting announcement:', error);

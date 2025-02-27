@@ -3,6 +3,7 @@ import './CourseAnnouncement.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Outlet } from 'react-router-dom';
+import useApi from '../../utils/api';
 
 const CreateAnnouncement = () => {
     const [announcement, setannouncement] = useState({
@@ -14,47 +15,36 @@ const CreateAnnouncement = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const { courseId } = useParams();
+    const { apiRequest }=useApi()
 
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-        navigate('/login');
-    }
+    
 
     const handleCreateAnnouncement = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         console.log('Creating announcement:', announcement);
-        
+
 
         // const formData = new FormData();
         // formData.append('text', announcement?.text);
-        
+
         // if (announcement.materials) {
         //     formData.append('materials', announcement.materials);
         // }
-            // console.log('formData |----->', formData);
+        // console.log('formData |----->', formData);
         try {
-
-            const response = await axios.post(
-                    `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`,
+            const response=await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/announcements`, 'POST', {
+                text: announcement.text,
+                materials: announcement.link && [
                     {
-                        text: announcement?.text,
-                         materials: [
-                        {
-                          link: {
-                            url: announcement?.link,
-                            title: "Study Guide"
-                          }
-                        }
-                      ],
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
+                        link: {
+                            url: announcement.link,
+                            title: 'Study Guide',
                         },
-                    }
-                );
+                    },
+                ],
+            });
             console.log('response:', response);
             console.log('announcement:', announcement);
             setannouncement({ text: '', link: null });

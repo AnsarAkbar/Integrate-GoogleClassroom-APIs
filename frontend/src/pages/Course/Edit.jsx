@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Create.css';
 import { useNavigate, useParams } from 'react-router-dom';
+import useApi from '../../utils/api';
 
 const Edit = () => {
     const [courseData, setCourseData] = useState({
@@ -14,13 +15,9 @@ const Edit = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { courseId } = useParams();
     const navigate = useNavigate();
+    const { apiRequest }=useApi();
 
-    const accessToken = localStorage.getItem("accessToken");
-
-    if (!accessToken) {
-        navigate('/login');
-    }
-
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCourseData({
@@ -32,14 +29,7 @@ const Edit = () => {
     useEffect(() => {
         const fetchCourse = async () => {
             try {
-                const response = await axios.get(
-                    `https://classroom.googleapis.com/v1/courses/${courseId}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    }
-                );
+                const response = await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}`);
                 setCourseData(response.data);
             } catch (error) {
                 console.error('Error fetching course:', error);
@@ -47,7 +37,7 @@ const Edit = () => {
             }
         };
         fetchCourse();
-    }, [accessToken, courseId]);
+    }, [courseId]);
 
 
     const handleSubmit = async (e) => {
@@ -71,13 +61,7 @@ const Edit = () => {
 
     const updateCourse = async (courseId) => {
         try {
-            const response = await axios.put(
-                `https://classroom.googleapis.com/v1/courses/${courseId}`,
-                courseData,
-                {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }
-            );
+            const response = await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}`, 'PUT', courseData);
             return response;
         } catch (error) {
             setMessage(`Error updating course: ${error.message}`);

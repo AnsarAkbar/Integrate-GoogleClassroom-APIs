@@ -3,6 +3,7 @@ import axios from 'axios';
 import './Create.css';
 import CourseList from './List';
 import { useNavigate } from 'react-router-dom';
+import useApi from '../../utils/api.js';
 
 const AddCourse = () => {
     const [courseData, setCourseData] = useState({
@@ -14,13 +15,14 @@ const AddCourse = () => {
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const { apiRequest } = useApi();
     const navigate = useNavigate();
 
-    const accessToken = localStorage.getItem("accessToken");
+    // const accessToken = localStorage.getItem("accessToken");
 
-    if (!accessToken) {
-        navigate('/login');
-    }
+    // if (!accessToken) {
+    //     navigate('/login');
+    // }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -55,9 +57,8 @@ const AddCourse = () => {
 
     const createCourse = async () => {
         try {
-            const response = await axios.post('https://classroom.googleapis.com/v1/courses', courseData, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            });
+            const response = await apiRequest('https://classroom.googleapis.com/v1/courses', 'POST', courseData);
+            console.log(response);
 
             if (response.status === 200) {
                 setMessage('Course created successfully');
@@ -97,13 +98,7 @@ const AddCourse = () => {
 
     const updateCourse = async (courseId) => {
         try {
-            const response = await axios.put(
-                `https://classroom.googleapis.com/v1/courses/${courseId}`,
-                courseData,
-                {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }
-            );
+            const response=apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}`, 'PUT', courseData);
             return response;
         } catch (error) {
             setMessage(`Error updating course: ${error.message}`);
@@ -157,7 +152,7 @@ const AddCourse = () => {
                 </form>
                 {message && <p className={`message ${message.includes('success') ? 'success' : 'error'}`}>{message}</p>}
             </div>
-            <CourseList setCourseData={setCourseData} setIsEditing={setIsEditing} />
+            {/* <CourseList setCourseData={setCourseData} setIsEditing={setIsEditing} /> */}
         </>
     );
 };

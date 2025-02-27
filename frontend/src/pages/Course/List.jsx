@@ -1,39 +1,19 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import './List.css';
 import { NavLink, useNavigate } from 'react-router-dom';
+import useApi from '../../utils/api';
+import './List.css';
 
 const CourseList = () => {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { apiRequest } = useApi();
     const navigate = useNavigate()
 
-    const accessToken = localStorage.getItem('accessToken')
-
-    if (!accessToken) {
-        navigate('/login');
-    }
-
     useEffect(() => {
-        if (!accessToken) {
-            setError('Please log in first');
-            setLoading(false);
-            return;
-        } else {
-            setError('');
-        }
-
         const fetchCourses = async () => {
             try {
-                const response = await axios.get(
-                    'https://classroom.googleapis.com/v1/courses',
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    }
-                );
+                const response = await apiRequest('https://classroom.googleapis.com/v1/courses', 'GET');
                 setCourses(response.data.courses || []);
                 setLoading(false);
             } catch (error) {
@@ -44,19 +24,11 @@ const CourseList = () => {
         };
 
         fetchCourses();
-    }, [accessToken]);
+    }, []);
 
     const handleDelete = async (courseId) => {
         try {
-            await axios.delete(
-                `https://classroom.googleapis.com/v1/courses/${courseId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-
+            await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}`, 'DELETE');
             setCourses(courses.filter(course => course.id !== courseId));
         } catch (error) {
             console.error('Error while deleting courses:', error);
@@ -86,7 +58,7 @@ const CourseList = () => {
 
             {/* Display message when no active courses */}
             {courses.filter(course => course.courseState === 'ACTIVE').length === 0 ? (
-                <p className="no-courses" >No active courses available.</p>
+                <p className="no-courses">No active courses available.</p>
             ) : (
                 <ul className="course-list-items">
                     {courses.map((course) =>

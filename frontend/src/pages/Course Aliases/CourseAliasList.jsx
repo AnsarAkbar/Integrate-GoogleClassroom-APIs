@@ -1,26 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import useApi from '../../utils/api';
 
 const CourseAliasList = () => {
   const [courseAliases, setCourseAliases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { courseId } = useParams();
+  const { apiRequest }=useApi()
 
-  const accessToken = localStorage.getItem('accessToken');
 
   useEffect(() => {
     const fetchCourseAliases = async () => {
       try {
-        const response = await axios.get(`https://classroom.googleapis.com/v1/courses/${courseId}/aliases`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const response = await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/aliases`);
         setCourseAliases(response.data);
       } catch (err) {
         setError(err.message);
@@ -34,14 +28,8 @@ const CourseAliasList = () => {
 
   const handleDelete = async (aliasId) => {
     try {
-      await axios.delete(`https://classroom.googleapis.com/v1/courses/${courseId}/aliases/${aliasId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}/aliases/${aliasId}`, 'DELETE');
+
       setCourseAliases(courseAliases.filter(alias => alias.id !== aliasId));
     } catch (err) {
       setError(err.message);
