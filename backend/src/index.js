@@ -37,85 +37,38 @@ app.use(session({
     }
 }));
 
-// Route to initiate OAuth flow
+const SCOPES = [
+  'https://www.googleapis.com/auth/classroom.announcements',
+  'https://www.googleapis.com/auth/classroom.courses',
+];
 app.get('/auth/google', (req, res) => {
     const url = oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: [
-            'https://www.googleapis.com/auth/classroom.courses',
-            'https://www.googleapis.com/auth/userinfo.profile'
-        ],
+      access_type: 'offline',
+      scope: SCOPES,
     });
-    // console.log("url", url)
     res.redirect(url);
-});
-
-// Route to handle callback
-app.get('/auth/google/callback', async (req, res) => {
+  });
+  
+//   // Handle the callback from Google
+  app.get('/auth/google/callback', async (req, res) => {
     const { code } = req.query;
-    // console.log('Authorization Code:', code);
-
+  
     if (!code) {
-        return res.status(400).send('Authorization code is missing');
+      return res.status(400).send('Authorization code is missing');
     }
-
+  
     try {
-        // Exchange the authorization code for tokens
-        const { tokens } = await oauth2Client.getToken(code);
-
-        // Set the credentials for the OAuth2 client
-        oauth2Client.setCredentials(tokens);
-
-        req.session.tokens = tokens;
-        // console.log('Session after saving tokens:', req.session.tokens);
-
-        // Redirect the user to the frontend
-        res.redirect('http://localhost:5173');
+      // Exchange the authorization code for tokens
+      const { tokens } = await oauth2Client.getToken(code);
+      oauth2Client.setCredentials(tokens);
+  
+      // Redirect the user to the frontend with the access token as a query parameter
+      res.redirect(`http://localhost:5173?access_token=${tokens.access_token}`);
     } catch (error) {
-        console.error('Error exchanging code for tokens:', error);
-        res.status(500).send('Authentication failed');
+      console.error('Error exchanging code for tokens:', error);
+      res.status(500).send('Authentication failed');
     }
-});
-
-// Route to create a course
-app.post('/courses', async (req, res) => {
-    console.log('Api hit')
-    const tokens = req.session.tokens;
-
-    console.log('token------------------------->', req.session)
-    if (!tokens) {
-        return res.status(401).send('User not authenticated');
-    }
-    // console.log('--->', tokens)
-
-    // Set the credentials for the OAuth2 client
-    oauth2Client.setCredentials(tokens);
-    try {
-        // Fetch the authenticated user's profile
-        const people = google.people({ version: 'v1', auth: oauth2Client });
-        const profile = await people.people.get({
-            resourceName: 'people/me',
-            personFields: 'names,emailAddresses',
-        });
-
-        const ownerId = profile.data.resourceName.split('/')[1]; // Extract the user ID
-        console.log("------ownerId-------", ownerId)
-
-        // Create the course
-        const classroom = google.classroom({ version: 'v1', auth: oauth2Client });
-        const course = {
-            name: req.body.name,
-            section: req.body.section,
-            description: req.body.description,
-            ownerId: ownerId, // Add the ownerId
-        };
-        const response = await classroom.courses.create({ requestBody: course });
-        res.json(response.data);
-    } catch (error) {
-        console.error('Error creating course:', error);
-        res.status(500).send('Failed to create course');
-    }
-});
+  });
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

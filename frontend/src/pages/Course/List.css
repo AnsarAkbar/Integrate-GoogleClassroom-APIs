@@ -1,0 +1,139 @@
+/* Main container */
+.course-list {
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.heading {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Message when no active courses */
+.no-courses {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* List of courses */
+.course-list-items {
+  list-style-type: none;
+  padding: 0;
+}
+
+.course-card {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  margin-bottom: 15px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Course details */
+.course-details {
+  flex: 1;
+}
+
+.course-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0px 8px 0px 0px;
+}
+
+.course-description {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.course-section,
+.course-id {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.add-course-btn {
+  text-decoration: none;
+  padding: 8px 15px;
+  margin: 0px 2px 8px 2px; 
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #2196f3;
+  color: white;
+}
+
+/* Course actions (buttons) */
+.course-actions {
+  /* display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between; */
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 15px;
+  margin: 0px 2px 8px 2px; 
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-btn {
+  background-color: #4caf50;
+  color: white;
+  padding-left: 10px;
+}
+
+.edit-btn:hover {
+  background-color: #45a049;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #e53935;
+}
+
+.create-announcement-btn {
+  padding: 8px 15px;
+  margin: 0px 2px 8px 2px; 
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #2196f3;
+  color: white;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .course-card {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .course-actions {
+      align-items: flex-start;
+  }
+}
