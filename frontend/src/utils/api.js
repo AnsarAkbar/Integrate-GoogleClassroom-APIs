@@ -5,6 +5,12 @@ const useApi = () => {
     const navigate = useNavigate();
 
     const apiRequest = async (url, method = 'GET', data = null) => {
+        const token = new URLSearchParams(window.location.search).get('access_token');
+        if (token) {
+            localStorage.setItem('accessToken', token);
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
             navigate('/login');
@@ -23,7 +29,6 @@ const useApi = () => {
             return response;
         } catch (error) {
             if (error.response && error.response.status === 401) {
-                // Token is expired or invalid
                 localStorage.removeItem('accessToken');
                 navigate('/login');
             } else {

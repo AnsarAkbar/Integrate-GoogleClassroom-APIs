@@ -32,7 +32,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: false, // Set to true if using HTTPS
+        secure: false, 
         maxAge: 1000 * 60 * 60 * 24, // 1 day session timeout
     }
 }));
@@ -49,7 +49,7 @@ app.get('/auth/google', (req, res) => {
     res.redirect(url);
   });
   
-//   // Handle the callback from Google
+// Handle the callback from Google
   app.get('/auth/google/callback', async (req, res) => {
     const { code } = req.query;
   
@@ -58,12 +58,13 @@ app.get('/auth/google', (req, res) => {
     }
   
     try {
-      // Exchange the authorization code for tokens
+     
       const { tokens } = await oauth2Client.getToken(code);
       oauth2Client.setCredentials(tokens);
+
+      // console.log('tokens:', tokens);
   
-      // Redirect the user to the frontend with the access token as a query parameter
-      res.redirect(`http://localhost:5173?access_token=${tokens.access_token}`);
+      res.redirect(`http://localhost:5173?access_token=${tokens?.access_token}`);
     } catch (error) {
       console.error('Error exchanging code for tokens:', error);
       res.status(500).send('Authentication failed');

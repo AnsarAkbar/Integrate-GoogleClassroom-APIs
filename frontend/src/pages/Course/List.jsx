@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import useApi from '../../utils/api';
 import './List.css';
+import axios from 'axios';
 
 const CourseList = () => {
     const [courses, setCourses] = useState([]);
@@ -14,7 +15,7 @@ const CourseList = () => {
         const fetchCourses = async () => {
             try {
                 const response = await apiRequest('https://classroom.googleapis.com/v1/courses', 'GET');
-                setCourses(response.data.courses || []);
+                setCourses(response?.data?.courses || []);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching courses:', error);
@@ -28,6 +29,11 @@ const CourseList = () => {
 
     const handleDelete = async (courseId) => {
         try {
+            // const response=await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}`,'PATCH', {
+            //     courseState: 'ARCHIVED',
+            // });
+            // console.log(response);
+
             await apiRequest(`https://classroom.googleapis.com/v1/courses/${courseId}`, 'DELETE');
             setCourses(courses.filter(course => course.id !== courseId));
         } catch (error) {
@@ -56,7 +62,7 @@ const CourseList = () => {
             <NavLink to="/create-course" className="add-course-btn">Add Course</NavLink>
             <h2 className="heading">Active Courses</h2>
 
-            {/* Display message when no active courses */}
+            
             {courses.filter(course => course.courseState === 'ACTIVE').length === 0 ? (
                 <p className="no-courses">No active courses available.</p>
             ) : (
@@ -74,7 +80,7 @@ const CourseList = () => {
                                     <div>
                                         <button
                                             className="edit-btn"
-                                            onClick={() => navigate(`/course-aliases/${course.id}`)}
+                                            onClick={() => navigate(`/course-aliases/${course?.id}`)}
                                         >
                                             Edit Title
                                         </button>
@@ -86,7 +92,7 @@ const CourseList = () => {
                                         </button>
                                         <button
                                             className="delete-btn"
-                                            onClick={() => handleDelete(course.id)}
+                                            onClick={() => handleDelete(course?.id)}
                                         >
                                             Delete
                                         </button>

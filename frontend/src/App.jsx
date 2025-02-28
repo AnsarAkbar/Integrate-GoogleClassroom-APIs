@@ -18,30 +18,20 @@ const App = () => {
   //   window.location.href = 'http://localhost:4000/auth/google';
   // };
 
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const token = queryParams.get('access_token');
-
-    if (token) {
-      localStorage.setItem('accessToken', token); 
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []);
+  // useEffect(() => {
+  //   debugger;
+  //   const token = new URLSearchParams(window.location.search).get('access_token');
+  //   console.log('token:', token);
+    
+  //   if (token) {
+  //     localStorage.setItem('accessToken', token); 
+  //     // window.history.replaceState({}, document.title, window.location.pathname);
+  //   }
+  // }, []);
 
   return (
     <>
-      {/* <div className="login-with-google">
-        {!accessToken ? (
-          <button type="submit" className="google-login-btn" onClick={handleLogin}>
-            <img src="./public/google_icon.png" alt="Google Icon" className="google-icon" />
-            Login with Google
-          </button>
-        ) : (
-          <p>Logged in successfully!</p>
-        )}
-      </div> */}
-      
-      <Router>
+    <Router>
         <Routes>
           <Route path="/" element={<CourseList />} />
           <Route path="/create-course" element={<AddCourse />} />
